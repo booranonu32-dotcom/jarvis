@@ -1,0 +1,973 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JARVIS AI</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --cyan:#76eee6;
+  --cyan2:#21cfc5;
+  --white:#f4ffff;
+  --muted:#9aafb8;
+  --panel:rgba(14,25,31,.88);
+  --border:rgba(90,225,215,.2);
+}
+
+* {box-sizing:border-box}
+html {scroll-behavior:smooth}
+
+body {
+  margin:0;
+  min-height:100vh;
+  overflow-x:hidden;
+  font-family:Inter,Arial,sans-serif;
+  color:var(--white);
+  background:radial-gradient(ellipse at 50% 40%,#142a30 0%,#091318 48%,#05090d 100%);
+}
+
+body::before {
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  opacity:.12;
+  background-image:
+    linear-gradient(rgba(118,238,230,.12) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(118,238,230,.12) 1px,transparent 1px);
+  background-size:48px 48px;
+  mask-image:linear-gradient(to bottom,black,transparent 90%);
+}
+
+header,main,footer {position:relative;z-index:1}
+
+header {
+  min-height:75px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  padding:12px 5%;
+  background:rgba(5,12,16,.88);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+}
+
+.logo {
+  font-family:Orbitron,sans-serif;
+  font-size:23px;
+  font-weight:800;
+  letter-spacing:4px;
+  color:var(--cyan);
+  text-shadow:0 0 18px #21cfc577;
+}
+
+.logo span {color:white}
+
+.status {
+  display:flex;
+  align-items:center;
+  gap:9px;
+  color:#82e8bd;
+  font-family:Orbitron,sans-serif;
+  font-size:10px;
+}
+
+.dot {
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#82e8bd;
+  box-shadow:0 0 12px #82e8bd;
+  animation:blink 1.5s infinite;
+}
+
+@keyframes blink {50% {opacity:.35}}
+
+nav {display:flex;gap:9px}
+
+nav button,.small-btn {
+  border:1px solid var(--border);
+  background:#101e24;
+  color:#d9f8f5;
+  padding:11px 16px;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:600;
+  transition:.25s;
+}
+
+nav button:hover,nav button.active {
+  border-color:var(--cyan);
+  color:white;
+  background:#17383b;
+  box-shadow:0 0 16px #21cfc522;
+}
+
+main {
+  width:min(1150px,94%);
+  margin:30px auto 45px;
+}
+
+.page {display:none;animation:pageIn .4s ease}
+.page.active {display:block}
+
+@keyframes pageIn {
+  from {opacity:0;transform:translateY(12px)}
+  to {opacity:1;transform:translateY(0)}
+}
+
+.hero {
+  text-align:center;
+  padding:25px 0 5px;
+}
+
+.eyebrow {
+  color:var(--cyan);
+  font-family:Orbitron,sans-serif;
+  font-size:10px;
+  letter-spacing:5px;
+}
+
+h1 {
+  margin:18px 0 10px;
+  font-family:Orbitron,sans-serif;
+  font-size:clamp(28px,5vw,47px);
+  letter-spacing:2px;
+}
+
+.gradient {
+  color:var(--cyan);
+  text-shadow:0 0 22px #21cfc555;
+}
+
+.subtitle {color:var(--muted);font-size:14px}
+
+.orb-area {
+  height:370px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  margin:10px auto;
+}
+
+.orb {
+  width:210px;
+  height:210px;
+  border-radius:50%;
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  isolation:isolate;
+  background:radial-gradient(circle at 34% 27%,#ffffff 0%,#efffff 10%,#c9fffb 22%,#70e8df 42%,#22aaa8 68%,#123b43 100%);
+  box-shadow:0 0 22px #b9fffa88,0 0 55px #40d8d055,0 0 105px #22aaa833,inset -18px -22px 35px #09252c88,inset 12px 12px 25px #ffffffaa;
+  animation:orbIdle 5s ease-in-out infinite;
+  transition:box-shadow .4s;
+}
+
+.orb::before {
+  content:"";
+  position:absolute;
+  inset:-17px;
+  border-radius:50%;
+  border:1px solid #a9fff477;
+  box-shadow:0 0 20px #70e8df33,inset 0 0 20px #70e8df11;
+  animation:halo 4s ease-in-out infinite;
+}
+
+.orb::after {
+  content:"";
+  position:absolute;
+  inset:-32px;
+  border-radius:50%;
+  border:1px solid #a9fff433;
+  box-shadow:0 0 25px #70e8df22;
+  animation:halo 5s ease-in-out infinite reverse;
+}
+
+.orb-core {
+  width:95px;
+  height:95px;
+  border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#ffffff 0%,#f3ffff 20%,#b9fff8 55%,#58d9d1 100%);
+  box-shadow:0 0 20px #ffffff,0 0 42px #a5fff4,0 0 75px #47d8ce;
+  position:relative;
+  z-index:2;
+}
+
+.orb-core::after {
+  content:"";
+  position:absolute;
+  width:35px;
+  height:15px;
+  top:19px;
+  left:22px;
+  border-radius:50%;
+  background:#ffffffbb;
+  filter:blur(9px);
+}
+
+@keyframes orbIdle {
+  0%,100% {transform:scale(1)}
+  50% {transform:scale(1.035)}
+}
+
+@keyframes halo {
+  0%,100% {transform:scale(1);opacity:.55}
+  50% {transform:scale(1.055);opacity:1}
+}
+
+.orb.listening {
+  animation:orbListening 1.1s ease-in-out infinite alternate;
+  box-shadow:0 0 30px #dfffff,0 0 70px #6cece3aa,0 0 130px #21cfc566,inset 0 0 35px #ffffffaa;
+}
+
+.orb.listening .orb-core {
+  animation:coreListening .9s ease-in-out infinite alternate;
+}
+
+.orb.listening::before {animation:halo .8s ease-in-out infinite}
+
+@keyframes orbListening {
+  from {transform:scale(1)}
+  to {transform:scale(1.09)}
+}
+
+@keyframes coreListening {
+  from {transform:scale(1)}
+  to {transform:scale(1.16)}
+}
+
+.orb-label {
+  position:absolute;
+  bottom:12px;
+  color:var(--cyan);
+  font-family:Orbitron,sans-serif;
+  font-size:10px;
+  letter-spacing:5px;
+  text-shadow:0 0 12px #21cfc5;
+}
+
+.voice-status {
+  text-align:center;
+  color:#c4fffa;
+  font-size:13px;
+  min-height:22px;
+}
+
+.controls {
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  flex-wrap:wrap;
+  margin:24px 0;
+}
+
+.action {
+  border:1px solid #65e8df88;
+  border-radius:11px;
+  padding:14px 20px;
+  cursor:pointer;
+  font-family:Orbitron,sans-serif;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:1px;
+  color:white;
+  background:linear-gradient(120deg,#176f70,#159b99);
+  box-shadow:0 0 18px #21cfc522;
+  transition:.3s;
+}
+
+.action:hover {
+  transform:translateY(-3px);
+  background:linear-gradient(120deg,#168f8a,#24bdb2);
+  box-shadow:0 0 24px #21cfc566;
+}
+
+.action.secondary {
+  color:#d9f8f5;
+  background:#101d22;
+  border-color:#527c7c;
+}
+
+.action.secondary:hover {
+  border-color:var(--cyan);
+  box-shadow:0 0 20px #21cfc533;
+}
+
+.action:disabled {opacity:.5;cursor:not-allowed}
+
+.quick {
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+  margin:28px auto;
+  max-width:760px;
+}
+
+.quick button {
+  min-height:92px;
+  padding:15px 8px;
+  border:1px solid var(--border);
+  border-radius:14px;
+  color:#e5f9f7;
+  background:linear-gradient(145deg,#15262b,#0b151a);
+  font-weight:700;
+  cursor:pointer;
+  transition:.25s;
+}
+
+.quick button:hover {
+  transform:translateY(-5px);
+  border-color:var(--cyan);
+  box-shadow:0 0 20px #21cfc533;
+}
+
+.quick button span {
+  display:block;
+  font-size:25px;
+  margin-bottom:8px;
+}
+
+.panel {
+  background:linear-gradient(145deg,rgba(19,34,39,.96),rgba(7,15,19,.96));
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:22px;
+  box-shadow:0 15px 40px #0006;
+  backdrop-filter:blur(15px);
+}
+
+.chat-panel {max-width:850px;margin:20px auto}
+
+.chat-head {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  border-bottom:1px solid var(--border);
+  padding-bottom:15px;
+  color:var(--cyan);
+}
+
+.chat-head b {
+  font-family:Orbitron,sans-serif;
+  letter-spacing:1px;
+}
+
+.messages {
+  height:360px;
+  overflow-y:auto;
+  padding:18px 5px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.msg {
+  max-width:85%;
+  padding:13px 16px;
+  border-radius:14px;
+  line-height:1.6;
+  font-size:14px;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+}
+
+.user {
+  align-self:flex-end;
+  color:white;
+  background:#176f70;
+  border:1px solid #76eee655;
+  border-bottom-right-radius:4px;
+}
+
+.bot {
+  align-self:flex-start;
+  color:#e9fffd;
+  background:#14272d;
+  border:1px solid #76eee633;
+  border-bottom-left-radius:4px;
+}
+
+.composer {
+  display:flex;
+  gap:9px;
+  padding-top:13px;
+  border-top:1px solid var(--border);
+}
+
+.composer input {
+  flex:1;
+  min-width:0;
+  color:white;
+  border:1px solid #527c7c;
+  outline:none;
+  border-radius:11px;
+  padding:14px;
+  font-size:14px;
+  background:#081419;
+}
+
+.composer input:focus {
+  border-color:var(--cyan);
+  box-shadow:0 0 15px #21cfc533;
+}
+
+.composer input::placeholder {color:#82989e}
+
+.settings {max-width:680px;margin:20px auto}
+
+.settings h2 {
+  color:var(--cyan);
+  font-family:Orbitron,sans-serif;
+  font-size:21px;
+}
+
+.settings label {
+  display:block;
+  margin:19px 0 8px;
+  color:#c4f7f2;
+  font-size:13px;
+  font-weight:600;
+}
+
+.settings select {
+  width:100%;
+  padding:14px;
+  border:1px solid #527c7c;
+  border-radius:10px;
+  outline:none;
+  background:#0b191e;
+  color:white;
+  font-size:14px;
+}
+
+.settings select:focus {border-color:var(--cyan)}
+.settings option {background:#0b191e;color:white}
+.settings p {line-height:1.7}
+
+footer {
+  text-align:center;
+  color:#91b7b5;
+  font-family:Orbitron,sans-serif;
+  font-size:10px;
+  letter-spacing:2px;
+  padding:28px 15px;
+  border-top:1px solid var(--border);
+}
+
+::-webkit-scrollbar {width:7px}
+::-webkit-scrollbar-track {background:#091318}
+::-webkit-scrollbar-thumb {background:#398d89;border-radius:10px}
+
+@media(max-width:700px) {
+  header {padding:13px 4%;flex-wrap:wrap;gap:12px}
+  .logo {font-size:20px;letter-spacing:3px}
+  nav {order:3;width:100%;justify-content:center}
+  nav button {flex:1;padding:10px 7px;font-size:11px}
+  .status {font-size:9px}
+  main {width:94%;margin-top:20px}
+  .orb-area {height:315px}
+  .orb {width:175px;height:175px}
+  .orb-core {width:78px;height:78px}
+  .quick {grid-template-columns:repeat(2,1fr)}
+  .messages {height:45vh}
+  .panel {padding:15px}
+  .action {padding:12px 13px;font-size:10px}
+  .msg {max-width:92%}
+}
+
+@media(prefers-reduced-motion:reduce) {
+  *,*::before,*::after {
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">JARVIS <span style="font-size:10px">AI</span></div>
+
+  <nav>
+    <button class="active" onclick="showPage('home',this)">Home</button>
+    <button onclick="showPage('chat',this)">Live Chat</button>
+    <button onclick="showPage('settings',this)">Menu</button>
+  </nav>
+
+  <div class="status">
+    <span class="dot"></span>
+    <span id="apiStatus">CONNECTING</span>
+  </div>
+</header>
+
+<main>
+
+<section class="page active" id="home">
+  <div class="hero">
+    <div class="eyebrow">YOUR PERSONAL AI ASSISTANT</div>
+    <h1>HELLO, <span class="gradient">I'M JARVIS</span></h1>
+    <div class="subtitle">Your intelligent voice companion</div>
+  </div>
+
+  <div class="orb-area">
+    <div class="orb" id="orb" onclick="toggleListening()" title="Tap to speak">
+      <div class="orb-core"></div>
+    </div>
+    <div class="orb-label">J A R V I S &nbsp; C O R E</div>
+  </div>
+
+  <div class="voice-status" id="voiceStatus">Tap the glowing core to talk</div>
+
+  <div class="controls">
+    <button class="action" onclick="toggleListening()">🎙 START LISTENING</button>
+    <button class="action secondary" onclick="stopListening()">■ STOP</button>
+    <button class="action secondary" onclick="showPage('chat')">✦ OPEN LIVE CHAT</button>
+  </div>
+
+  <div class="quick">
+    <button onclick="quickCommand('YouTube')"><span>▶️</span>YouTube</button>
+    <button onclick="quickCommand('Google')"><span>🌐</span>Google</button>
+    <button onclick="quickCommand('Time')"><span>🕒</span>Time</button>
+    <button onclick="quickCommand('Date')"><span>📅</span>Date</button>
+  </div>
+</section>
+
+<section class="page" id="chat">
+  <div class="chat-panel panel">
+    <div class="chat-head">
+      <div>
+        <b>✦ JARVIS LIVE CHAT</b>
+        <div class="subtitle">AI conversation</div>
+      </div>
+      <button class="small-btn" onclick="clearChat()">Clear</button>
+    </div>
+
+    <div class="messages" id="messages">
+      <div class="msg bot">Hello! I am JARVIS. How can I help you?</div>
+    </div>
+
+    <div class="composer">
+      <button class="small-btn" onclick="toggleListening()">🎙</button>
+      <input id="userInput" placeholder="Message JARVIS..." onkeydown="if(event.key==='Enter')sendMessage()">
+      <button class="action" id="sendButton" onclick="sendMessage()">➤</button>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="settings">
+  <div class="settings panel">
+    <h2>⚙ JARVIS Settings</h2>
+
+    <label>Assistant Language</label>
+    <select id="language">
+      <option value="hi-IN">Hindi</option>
+      <option value="en-IN">English</option>
+      <option value="hi-IN">Haryanvi</option>
+    </select>
+
+    <label>Voice Response</label>
+    <select id="voiceEnabled">
+      <option value="yes">Voice On</option>
+      <option value="no">Voice Off</option>
+    </select>
+
+    <label>API Connection</label>
+    <p id="apiInfo" class="subtitle">Checking server...</p>
+
+    <button class="action" onclick="checkAPI()">CHECK CONNECTION</button>
+    <button class="action secondary" onclick="clearChat()">CLEAR CHAT</button>
+  </div>
+</section>
+
+</main>
+
+<footer>JARVIS AI • FUTURE INTERFACE • Developer: Gaurav JAAT</footer>
+
+<script>
+const API_URL = "https://jarvis-ai-api.booragourav51.workers.dev/api/chat";
+const STATUS_URL = "https://jarvis-ai-api.booragourav51.workers.dev/api/status";
+
+let history = [];
+let recognition = null;
+let listening = false;
+let sending = false;
+
+function showPage(page, button) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(page).classList.add('active');
+
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+
+  if(button) {
+    button.classList.add('active');
+  } else {
+    const btn=[...document.querySelectorAll('nav button')].find(b=>
+      b.textContent.toLowerCase().includes(page==='chat'?'live':page));
+    if(btn)btn.classList.add('active');
+  }
+}
+
+function addMessage(text,type) {
+  const box=document.getElementById('messages');
+  const div=document.createElement('div');
+  div.className='msg '+type;
+  div.textContent=text;
+  box.appendChild(div);
+  box.scrollTop=box.scrollHeight;
+  return div;
+}
+
+function speak(text) {
+  if(document.getElementById('voiceEnabled').value==='no') return;
+  if(!('speechSynthesis' in window)) return;
+
+  speechSynthesis.cancel();
+  const utterance=new SpeechSynthesisUtterance(text);
+  utterance.lang=document.getElementById('language').value;
+  utterance.rate=1;
+  speechSynthesis.speak(utterance);
+}
+
+function extractReply(data) {
+  if(!data || typeof data!=='object') return '';
+
+  if(typeof data.reply==='string') return data.reply;
+  if(typeof data.response==='string') return data.response;
+  if(typeof data.text==='string') return data.text;
+  if(typeof data.output_text==='string') return data.output_text;
+
+  if(Array.isArray(data.steps)) {
+    const parts=[];
+    for(const step of data.steps) {
+      if(step.type==='model_output' && Array.isArray(step.content)) {
+        for(const item of step.content) {
+          if(item.type==='text' && typeof item.text==='string') parts.push(item.text);
+        }
+      }
+    }
+    if(parts.length) return parts.join('\n');
+  }
+
+  if(Array.isArray(data.output)) {
+    const parts=[];
+    for(const item of data.output) {
+      if(typeof item==='string') parts.push(item);
+      else if(item && typeof item.text==='string') parts.push(item.text);
+      else if(item && Array.isArray(item.content)) {
+        for(const content of item.content) {
+          if(content.type==='text' && typeof content.text==='string') parts.push(content.text);
+        }
+      }
+    }
+    if(parts.length) return parts.join('\n');
+  }
+
+  return '';
+}
+
+async function readStreamingResponse(response,messageElement) {
+  if(!response.body) throw new Error('Streaming response body is not available.');
+
+  const reader=response.body.getReader();
+  const decoder=new TextDecoder('utf-8');
+  let buffer='',reply='',finalData=null;
+
+  function processEvent(block) {
+    if(!block.trim()) return;
+
+    const lines=block.split(/\r?\n/);
+    let eventName='';
+    const dataLines=[];
+
+    for(const line of lines) {
+      if(line.startsWith('event:')) eventName=line.slice(6).trim();
+      else if(line.startsWith('data:')) dataLines.push(line.slice(5).trim());
+    }
+
+    if(!dataLines.length) return;
+
+    const rawData=dataLines.join('\n');
+    if(rawData==='[DONE]') return;
+
+    let payload;
+    try {payload=JSON.parse(rawData)}
+    catch(error) {return}
+
+    finalData=payload;
+
+    if(eventName==='step.delta') {
+      const delta=payload.delta;
+      if(delta && delta.type==='text' && typeof delta.text==='string') {
+        reply+=delta.text;
+        messageElement.textContent=reply;
+        const box=document.getElementById('messages');
+        box.scrollTop=box.scrollHeight;
+      }
+    }
+
+    if(eventName==='error' || eventName==='interaction.failed' || eventName==='step.failed') {
+      const errorText=payload.error?.message || payload.error || payload.message || payload.details || 'The AI request failed.';
+      throw new Error(typeof errorText==='string' ? errorText : JSON.stringify(errorText));
+    }
+  }
+
+  while(true) {
+    const {value,done}=await reader.read();
+    if(done) break;
+
+    buffer+=decoder.decode(value,{stream:true});
+    let boundary;
+
+    while((boundary=buffer.search(/\r?\n\r?\n/))!==-1) {
+      const block=buffer.slice(0,boundary);
+      const separator=buffer.slice(boundary).match(/^\r?\n\r?\n/)[0];
+      buffer=buffer.slice(boundary+separator.length);
+      processEvent(block);
+    }
+  }
+
+  buffer+=decoder.decode();
+  if(buffer.trim()) processEvent(buffer);
+
+  if(!reply && finalData) reply=extractReply(finalData);
+  if(!reply.trim()) throw new Error('The server connected, but returned an empty AI reply.');
+
+  return reply.trim();
+}
+
+async function sendMessage(textFromVoice) {
+  const input=document.getElementById('userInput');
+  const sendButton=document.getElementById('sendButton');
+  const message=(typeof textFromVoice==='string' ? textFromVoice : input.value).trim();
+
+  if(!message || sending) return;
+
+  input.value='';
+  showPage('chat');
+  addMessage(message,'user');
+
+  const previous=history.slice(-10);
+  history.push({role:'user',content:message});
+
+  const replyElement=addMessage('JARVIS is thinking...','bot');
+
+  sending=true;
+  sendButton.disabled=true;
+  sendButton.textContent='...';
+
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),60000);
+
+  try {
+    const response=await fetch(API_URL,{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Accept':'text/event-stream, application/json'
+      },
+      body:JSON.stringify({
+        message:message,
+        prompt:message,
+        language:document.getElementById('language').value,
+        history:previous
+      }),
+      signal:controller.signal
+    });
+
+    if(!response.ok) {
+      let errorMessage='Server error '+response.status;
+      try {
+        const errorData=await response.json();
+        errorMessage=errorData.error || errorData.message || errorMessage;
+      } catch(e) {}
+      throw new Error(errorMessage);
+    }
+
+    const contentType=(response.headers.get('content-type') || '').toLowerCase();
+    let reply='';
+
+    if(contentType.includes('text/event-stream')) {
+      reply=await readStreamingResponse(response,replyElement);
+    } else {
+      const data=await response.json();
+      reply=extractReply(data);
+      if(!reply) throw new Error(data.error || data.message || 'The server returned an empty response.');
+      replyElement.textContent=reply;
+    }
+
+    history.push({role:'assistant',content:reply});
+    speak(reply);
+
+  } catch(error) {
+    let messageText=error.message || 'Unknown connection error';
+    if(error.name==='AbortError') messageText='Request timed out. Please try again.';
+    replyElement.textContent='Connection problem: '+messageText+'\nPlease check your internet and Worker API.';
+
+  } finally {
+    clearTimeout(timer);
+    sending=false;
+    sendButton.disabled=false;
+    sendButton.textContent='➤';
+  }
+}
+
+function quickCommand(command) {
+  if(command==='YouTube') {
+    window.open('https://www.youtube.com','_blank');
+  } else if(command==='Google') {
+    window.open('https://www.google.com','_blank');
+  } else if(command==='Time') {
+    const t=new Date().toLocaleTimeString();
+    showPage('chat');
+    addMessage('Current time: '+t,'bot');
+    speak('The time is '+t);
+  } else if(command==='Date') {
+    const d=new Date().toLocaleDateString();
+    showPage('chat');
+    addMessage('Today is '+d,'bot');
+    speak('Today is '+d);
+  }
+}
+
+function clearChat() {
+  history=[];
+  document.getElementById('messages').innerHTML='<div class="msg bot">Chat cleared. I am ready!</div>';
+}
+
+/* MOBILE MICROPHONE + SPEECH RECOGNITION */
+
+async function toggleListening() {
+  if(listening) {
+    stopListening();
+    return;
+  }
+
+  const status=document.getElementById('voiceStatus');
+  const orb=document.getElementById('orb');
+
+  const SpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+  if(!window.isSecureContext) {
+    status.textContent='Microphone requires HTTPS or localhost.';
+    return;
+  }
+
+  if(!navigator.mediaDevices ||
+     !navigator.mediaDevices.getUserMedia) {
+    status.textContent='Microphone unavailable. Open in Chrome.';
+    return;
+  }
+
+  if(!SpeechRecognition) {
+    status.textContent='Speech recognition is not supported in this browser.';
+    return;
+  }
+
+  try {
+    status.textContent='Requesting microphone permission...';
+
+    const stream=await navigator.mediaDevices.getUserMedia({
+      audio:{
+        echoCancellation:true,
+        noiseSuppression:true,
+        autoGainControl:true
+      }
+    });
+
+    stream.getTracks().forEach(track=>track.stop());
+
+    recognition=new SpeechRecognition();
+    recognition.lang=document.getElementById('language').value;
+    recognition.continuous=false;
+    recognition.interimResults=false;
+    recognition.maxAlternatives=1;
+
+    recognition.onstart=()=>{
+      listening=true;
+      orb.classList.add('listening');
+      status.textContent='Listening... Speak now';
+    };
+
+    recognition.onresult=event=>{
+      const spoken=event.results[0][0].transcript;
+      status.textContent='You said: '+spoken;
+      sendMessage(spoken);
+    };
+
+    recognition.onerror=event=>{
+      const errors={
+        'not-allowed':'Allow microphone permission in Chrome settings.',
+        'service-not-allowed':'Speech service is not allowed.',
+        'audio-capture':'Microphone not found.',
+        'no-speech':'No speech detected. Try again.',
+        'network':'Speech recognition needs an internet connection.'
+      };
+
+      status.textContent=errors[event.error] || 'Mic error: '+event.error;
+    };
+
+    recognition.onend=()=>{
+      listening=false;
+      orb.classList.remove('listening');
+    };
+
+    recognition.start();
+
+  } catch(error) {
+    status.textContent='Microphone error: '+error.message;
+  }
+}
+
+function stopListening() {
+  listening=false;
+
+  document.getElementById('orb').classList.remove('listening');
+
+  if(recognition) {
+    try {
+      recognition.stop();
+    } catch(error) {}
+  }
+
+  document.getElementById('voiceStatus').textContent=
+    'Tap the glowing core to talk';
+}
+
+async function checkAPI() {
+  const status=document.getElementById('apiStatus');
+  const info=document.getElementById('apiInfo');
+
+  status.textContent='CHECKING';
+  info.textContent='Checking server...';
+
+  try {
+    const response=await fetch(STATUS_URL,{cache:'no-store'});
+    if(!response.ok) throw new Error('HTTP '+response.status);
+
+    status.textContent='API ONLINE';
+    info.textContent='Worker server is reachable. Send a message to test AI replies.';
+  } catch(error) {
+    status.textContent='API OFFLINE';
+    info.textContent='Could not reach Worker: '+error.message;
+  }
+}
+
+document.getElementById('userInput').addEventListener('focus',()=>{});
+checkAPI();
+</script>
+
+</body>
+</html>
